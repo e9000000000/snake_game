@@ -1,7 +1,7 @@
 #include "game.h"
 
 
-void print_borders() {
+void draw_gamefield() {
     for (int i = 0; i <= WIDTH + 1; i++) {
         print_square(i, 0, GREY);
         print_square(i, HEIGHT+1, GREY);
@@ -10,6 +10,8 @@ void print_borders() {
         print_square(0, i, GREY);
         print_square(WIDTH+1, i, GREY);
     }
+    print_text(0, HEIGHT + 2, "Score     - 0", DEFAULT);
+    print_text(0, HEIGHT + 3, "Max score - 0", DEFAULT);
 }
 
 void respawn_apple(struct Point *apple) {
@@ -20,7 +22,7 @@ void respawn_apple(struct Point *apple) {
 void restart(struct Point *player, enum direction *dir, struct Point *apple, int *score) {
     clear_terminal();
     hide_cursor();
-    print_borders();
+    draw_gamefield();
     *dir = Right;
     *score = 0;
 
@@ -35,18 +37,23 @@ void restart(struct Point *player, enum direction *dir, struct Point *apple, int
     respawn_apple(apple);
 }
 
+bool is_points_collided(struct Point *point1, struct Point *point2) {
+    return (*point1).x == (*point2).x && (*point1).y == (*point2).y;
+}
 
-bool is_collised_with_wals(struct Point *player) {
+bool is_collised_with_wals(struct Point *player, int *score) {
     if ((*player).x < 1) return true;
     if ((*player).x > WIDTH) return true;
     if ((*player).y < 1) return true;
     if ((*player).y > HEIGHT) return true;
 
-    return false;
-}
+    int player_length = SNAKE_START_LEGTH + *score;
+    for (int i = 1; i < player_length; i++) {
+        if (is_points_collided(&player[0], &player[i]))
+            return true;
+    }
 
-bool is_collised_with_apple(struct Point *player, struct Point *apple) {
-    return (*player).x == (*apple).x && (*player).y == (*apple).y;
+    return false;
 }
 
 void move_by_direction(struct Point *player, enum direction *dir) {
@@ -76,11 +83,11 @@ bool is_point_inside_gamefield(struct Point *point) {
     return (*point).x > 0 && (*point).y > 0 && (*point).x <= WIDTH && (*point).y <= HEIGHT;
 }
 
-void draw_changes(struct Point *player, struct Point *apple, int *score) {
+void draw_changes(struct Point *player, struct Point *apple, int *score, int *maxScore) {
     int player_length = SNAKE_START_LEGTH + *score;
 
     if (is_point_inside_gamefield(&player[player_length]))
-        print_square(player[player_length].x, player[player_length].y, BLACK);
+        print_square(player[player_length].x, player[player_length].y, DEFAULT);
     for (int i = 0; i < player_length; i++) {
         if (is_point_inside_gamefield(&player[i]))
             print_square(player[i].x, player[i].y, GREEN);
@@ -88,6 +95,9 @@ void draw_changes(struct Point *player, struct Point *apple, int *score) {
 
     if (is_point_inside_gamefield(apple))
         print_square((*apple).x, (*apple).y, RED);
+
+    print_num(6, HEIGHT + 2, *score, DEFAULT);
+    print_num(6, HEIGHT + 3, *maxScore, DEFAULT);
 }
 
 void* update_game(void *_dir) {
@@ -98,6 +108,7 @@ void* update_game(void *_dir) {
     enum direction *dir = (enum direction*)_dir;
     struct Point apple;
     int score = 0;
+    int maxScore = 0;
 
     restart(player, dir, &apple, &score);
 
@@ -105,11 +116,13 @@ void* update_game(void *_dir) {
         print_square((*player).x, (*player).y, GREEN);
         prepare_player_to_move(player, &score);
         move_by_direction(player, dir);
-        draw_changes(player, &apple, &score);
-        if (is_collised_with_wals(player))
+        draw_changes(player, &apple, &score, &maxScore);
+        if (is_collised_with_wals(player, &score))
             restart(player, dir, &apple, &score);
-        if (is_collised_with_apple(player, &apple)) {
+        if (is_points_collided(player, &apple)) {
             score += 1;
+            if (score > maxScore)
+                maxScore = score;
             respawn_apple(&apple);
         }
 
