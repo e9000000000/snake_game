@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <pthread.h>
 
 #include "terminal.h"
 #include "input.h"
@@ -9,53 +10,47 @@
 #define HEIGHT 15
 
 
-char** create_field() {
-    char **field = (char**)malloc(HEIGHT * sizeof(char*));
-    for (int i = 0; i < HEIGHT; i++) {
-        field[i] = (char*)malloc(WIDTH * sizeof(char));
-        for (int j = 0; j < WIDTH; j++)
-            field[i][j] = '#';
-    }
-    return field;
-}
-
-void print_field(char **field) {
-    int newLineSymbolAmount = HEIGHT;
-    int lineLength = (WIDTH * HEIGHT + newLineSymbolAmount);
-    char *printLine = malloc((lineLength+1) * sizeof(char));
-    for (int i = 0; i < HEIGHT; i++) {
-        for (int j = 0; j < WIDTH; j++) {
-            printLine[(WIDTH + 1) * i + j] = field[i][j];
-        }
-        int lineEndIndex = (WIDTH + 1) * i + WIDTH;
-        printLine[lineEndIndex] = '\n';
-
-    }
-    printLine[lineLength] = '\0';
-    printf(printLine);
-    free(printLine);
-}
-
-
-int main(int argc, char **argv) {
-    char **field = create_field();
-    clear_terminal();
-    hide_cursor();
-    print_field(field);
-
+void* update_game(void *_dir) {
     int x = 0;
     int y = 0;
+    enum direction *dir = (enum direction*)_dir;
     while (1) {
-        print_in(x, y, "7");
-        int key = getch();
-        if (key == 0x44)
-            x--;
-        if (key == 0x43)
+        print_square(x, y, BLACK);
+        if (*dir == Right) {
             x++;
-        if (key == 0x42)
+        }
+        if (*dir == Left) {
+            x--;
+        }
+        if (*dir == Up) {
             y--;
-        if (key == 0x41)
+        }
+        if (*dir == Down) {
             y++;
+        }
+        if (x < 0) x = 0;
+        if (x >= WIDTH) x = WIDTH - 1;
+        if (y < 0) y = 0;
+        if (y >= HEIGHT) y = HEIGHT - 1;
+        print_square(x, y, GREEN);
+
+        usleep(100000);
+    }
+    return 0;
+}
+
+int main(int argc, char **argv) {
+    clear_terminal();
+    hide_cursor();
+    enum direction dir = Right;
+
+    pthread_t thread_id;
+    pthread_create(&thread_id, NULL, update_game, &dir);
+    pthread_detach(thread_id);
+
+    while (1) {
+        set_direction_from_input(&dir);
+        //printf("dir: %d", dir);
     }
 
     show_cursor();
