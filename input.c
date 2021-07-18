@@ -15,7 +15,7 @@ int getch() {
 
 void set_direction_from_input(enum direction *dir) {
     int key = getch();
-    if (key == 0x44)
+    if (key == 0x44) // arrows
         *dir = Left;
     else if (key == 0x43)
         *dir = Right;
@@ -23,4 +23,20 @@ void set_direction_from_input(enum direction *dir) {
         *dir = Down;
     else if (key == 0x41)
         *dir = Up;
+    else if (key == 0x77) // w a s d
+        *dir = Up;
+    else if (key == 0x61)
+        *dir = Left;
+    else if (key == 0x73)
+        *dir = Down;
+    else if (key == 0x64)
+        *dir = Right;
+    else if (key == 0x68) // h j k l
+        *dir = Left;
+    else if (key == 0x6a)
+        *dir = Down;
+    else if (key == 0x6b)
+        *dir = Up;
+    else if (key == 0x6c)
+        *dir = Right;
 }
