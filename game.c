@@ -91,7 +91,7 @@ void* update_game(void *_dir) {
         if (is_collised_with_wals(player))
             restart(player, dir);
 
-        usleep(1000000/15);
+        usleep(1000000/FPS);
     }
     return 0;
 }

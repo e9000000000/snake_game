@@ -11,7 +11,7 @@
 #define WIDTH 20
 #define HEIGHT 15
 #define SNAKE_START_LEGTH 3
-#define FPS = 15
+#define FPS 15
 
 
 struct Point {
@@ -20,5 +20,4 @@ struct Point {
 };
 
 void* update_game(void *_dir);
-
 
