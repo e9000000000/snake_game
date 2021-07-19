@@ -150,9 +150,7 @@ void* update_game(void *_dir) {
     restart(player, dir, &apple, &score);
 
     while (1) {
-        print_square((*player).x, (*player).y, SNAKE_COLOR);
         move_by_direction(player, dir, &score);
-        draw_changes(player, &apple, &score, &maxScore);
         if (is_collised_with_wals(player, &score))
             restart(player, dir, &apple, &score);
         if (is_points_collided(player, &apple)) {
@@ -162,6 +160,7 @@ void* update_game(void *_dir) {
             respawn_apple(player, &apple, &score);
         }
 
+        draw_changes(player, &apple, &score, &maxScore);
         usleep(1000000/FPS);
     }
     return 0;
