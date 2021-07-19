@@ -9,7 +9,8 @@ enum direction {
     Up,
     Down,
     Left,
-    Right
+    Right,
+    Stop
 };
 
 int getch();

@@ -23,7 +23,7 @@ void restart(struct Point *player, enum direction *dir, struct Point *apple, int
     clear_terminal();
     hide_cursor();
     draw_gamefield();
-    *dir = Right;
+    *dir = Stop;
     *score = 0;
 
     int max_player_length = WIDTH * HEIGHT;
@@ -56,7 +56,20 @@ bool is_collised_with_wals(struct Point *player, int *score) {
     return false;
 }
 
-void move_by_direction(struct Point *player, enum direction *dir) {
+void prepare_player_to_move(struct Point *player, int *score) {
+    int player_length = SNAKE_START_LEGTH + *score;
+    for (int i = player_length; i > 0; i--) {
+        player[i].x = player[i - 1].x;
+        player[i].y = player[i - 1].y;
+    }
+}
+
+void move_by_direction(struct Point *player, enum direction *dir, int *score) {
+    if (*dir == Stop)
+        return;
+
+    prepare_player_to_move(player, score);
+
     if (*dir == Right) {
         (*player).x += 1;
     }
@@ -68,14 +81,6 @@ void move_by_direction(struct Point *player, enum direction *dir) {
     }
     if (*dir == Down) {
         (*player).y += 1;
-    }
-}
-
-void prepare_player_to_move(struct Point *player, int *score) {
-    int player_length = SNAKE_START_LEGTH + *score;
-    for (int i = player_length; i > 0; i--) {
-        player[i].x = player[i - 1].x;
-        player[i].y = player[i - 1].y;
     }
 }
 
@@ -114,8 +119,7 @@ void* update_game(void *_dir) {
 
     while (1) {
         print_square((*player).x, (*player).y, GREEN);
-        prepare_player_to_move(player, &score);
-        move_by_direction(player, dir);
+        move_by_direction(player, dir, &score);
         draw_changes(player, &apple, &score, &maxScore);
         if (is_collised_with_wals(player, &score))
             restart(player, dir, &apple, &score);
