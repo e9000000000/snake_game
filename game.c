@@ -14,9 +14,49 @@ void draw_gamefield() {
     print_text(0, HEIGHT + 3, "Max score - 0", DEFAULT);
 }
 
-void respawn_apple(struct Point *apple) {
-    (*apple).x = 1 + rand() % WIDTH;
-    (*apple).y = 1 + rand() % HEIGHT;
+bool is_points_collided(struct Point *point1, struct Point *point2) {
+    return (*point1).x == (*point2).x && (*point1).y == (*point2).y;
+}
+
+bool is_point_inside_gamefield(struct Point *point) {
+    return (*point).x > 0 && (*point).y > 0 && (*point).x <= WIDTH && (*point).y <= HEIGHT;
+}
+
+void respawn_apple(struct Point *player, struct Point *apple, int *score) {
+    int player_length = SNAKE_START_LEGTH + *score;
+    int field_area = WIDTH*HEIGHT;
+    int awailable_amount = field_area - player_length;
+    struct Point *all = malloc(field_area * sizeof(struct Point));
+    struct Point *awailable = malloc(awailable_amount * sizeof(struct Point));
+
+    for (int i = 0; i < field_area; i++) {
+        all[i].y = i / WIDTH + 1;
+        all[i].x = i % WIDTH + 1;
+    }
+
+    for (int i = 0; i < player_length; i++) {
+        int index = (player[i].y - 1) * WIDTH + (player[i].x - 1);
+        all[index].x = 0;
+        all[index].y = 0;
+    }
+
+    int offset = 0;
+    for (int i = 0; i < awailable_amount; i++) {
+        struct Point point = all[i + offset];
+        if (is_point_inside_gamefield(&point)) {
+            awailable[i].x = point.x;
+            awailable[i].y = point.y;
+        }
+        else
+            offset += 1;
+    }
+
+    struct Point chousen_point = awailable[rand() % awailable_amount];
+    (*apple).x = chousen_point.x;
+    (*apple).y = chousen_point.y;
+
+    free(all);
+    free(awailable);
 }
 
 void restart(struct Point *player, enum direction *dir, struct Point *apple, int *score) {
@@ -34,11 +74,7 @@ void restart(struct Point *player, enum direction *dir, struct Point *apple, int
     (*player).x = WIDTH / 2;
     (*player).y = HEIGHT / 2;
 
-    respawn_apple(apple);
-}
-
-bool is_points_collided(struct Point *point1, struct Point *point2) {
-    return (*point1).x == (*point2).x && (*point1).y == (*point2).y;
+    respawn_apple(player, apple, score);
 }
 
 bool is_collised_with_wals(struct Point *player, int *score) {
@@ -84,10 +120,6 @@ void move_by_direction(struct Point *player, enum direction *dir, int *score) {
     }
 }
 
-bool is_point_inside_gamefield(struct Point *point) {
-    return (*point).x > 0 && (*point).y > 0 && (*point).x <= WIDTH && (*point).y <= HEIGHT;
-}
-
 void draw_changes(struct Point *player, struct Point *apple, int *score, int *maxScore) {
     int player_length = SNAKE_START_LEGTH + *score;
 
@@ -127,7 +159,7 @@ void* update_game(void *_dir) {
             score += 1;
             if (score > maxScore)
                 maxScore = score;
-            respawn_apple(&apple);
+            respawn_apple(player, &apple, &score);
         }
 
         usleep(1000000/FPS);
