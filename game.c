@@ -3,12 +3,12 @@
 
 void draw_gamefield() {
     for (int i = 0; i <= WIDTH + 1; i++) {
-        print_square(i, 0, GREY);
-        print_square(i, HEIGHT+1, GREY);
+        print_square(i, 0, BORDERS_COLOR);
+        print_square(i, HEIGHT+1, BORDERS_COLOR);
     }
     for (int i = 0; i <= HEIGHT + 1; i++) {
-        print_square(0, i, GREY);
-        print_square(WIDTH+1, i, GREY);
+        print_square(0, i, BORDERS_COLOR);
+        print_square(WIDTH+1, i, BORDERS_COLOR);
     }
     print_text(0, HEIGHT + 2, "Score     - 0", DEFAULT);
     print_text(0, HEIGHT + 3, "Max score - 0", DEFAULT);
@@ -95,11 +95,11 @@ void draw_changes(struct Point *player, struct Point *apple, int *score, int *ma
         print_square(player[player_length].x, player[player_length].y, DEFAULT);
     for (int i = 0; i < player_length; i++) {
         if (is_point_inside_gamefield(&player[i]))
-            print_square(player[i].x, player[i].y, GREEN);
+            print_square(player[i].x, player[i].y, SNAKE_COLOR);
     }
 
     if (is_point_inside_gamefield(apple))
-        print_square((*apple).x, (*apple).y, RED);
+        print_square((*apple).x, (*apple).y, APPLE_COLOR);
 
     print_num(6, HEIGHT + 2, *score, DEFAULT);
     print_num(6, HEIGHT + 3, *maxScore, DEFAULT);
@@ -118,7 +118,7 @@ void* update_game(void *_dir) {
     restart(player, dir, &apple, &score);
 
     while (1) {
-        print_square((*player).x, (*player).y, GREEN);
+        print_square((*player).x, (*player).y, SNAKE_COLOR);
         move_by_direction(player, dir, &score);
         draw_changes(player, &apple, &score, &maxScore);
         if (is_collised_with_wals(player, &score))

@@ -13,6 +13,9 @@
 #define HEIGHT 15
 #define SNAKE_START_LEGTH 3
 #define FPS 15
+#define SNAKE_COLOR GREEN
+#define BORDERS_COLOR GREY
+#define APPLE_COLOR RED
 
 
 struct Point {
