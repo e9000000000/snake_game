@@ -9,10 +9,10 @@
 #include "input.h"
 #include "terminal.h"
 
-#define WIDTH 2
-#define HEIGHT 2
+#define WIDTH 16
+#define HEIGHT 16
 #define SNAKE_START_LENGTH 3
-#define FPS 4
+#define FPS 11
 #define SNAKE_COLOR GREEN
 #define BORDERS_COLOR GREY
 #define APPLE_COLOR RED
