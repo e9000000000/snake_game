@@ -11,7 +11,7 @@
 
 #define WIDTH 2
 #define HEIGHT 2
-#define SNAKE_START_LEGTH 3
+#define SNAKE_START_LENGTH 3
 #define FPS 4
 #define SNAKE_COLOR GREEN
 #define BORDERS_COLOR GREY
