@@ -24,6 +24,7 @@ bool is_point_inside_gamefield(struct Point *point) {
 
 void respawn_apple(struct Point *player, struct Point *apple, int *score) {
     int player_length = SNAKE_START_LEGTH + *score;
+    if (*score <= 0) player_length = 1;
     int field_area = WIDTH*HEIGHT;
     int awailable_amount = field_area - player_length;
     struct Point *all = malloc(field_area * sizeof(struct Point));
@@ -36,6 +37,8 @@ void respawn_apple(struct Point *player, struct Point *apple, int *score) {
 
     for (int i = 0; i < player_length; i++) {
         int index = (player[i].y - 1) * WIDTH + (player[i].x - 1);
+        if (index < 0 || index >= field_area) continue;
+
         all[index].x = 0;
         all[index].y = 0;
     }
@@ -47,8 +50,10 @@ void respawn_apple(struct Point *player, struct Point *apple, int *score) {
             awailable[i].x = point.x;
             awailable[i].y = point.y;
         }
-        else
+        else {
             offset += 1;
+            i--;
+        }
     }
 
     struct Point chousen_point = awailable[rand() % awailable_amount];
