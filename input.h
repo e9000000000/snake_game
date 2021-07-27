@@ -14,5 +14,6 @@ enum direction {
 };
 
 int getch();
+void restore_terminal_attrs();
 
 void set_direction_from_input(enum direction *dir);

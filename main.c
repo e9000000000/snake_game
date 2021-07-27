@@ -8,6 +8,7 @@
 void on_exit_signal(int dummy) {
     show_cursor();
     clear_terminal();
+    restore_terminal_attrs();
     exit(0);
 }
 

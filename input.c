@@ -1,8 +1,9 @@
 #include "input.h"
 
+struct termios oldattr;
 
 int getch() {
-    struct termios oldattr, newattr;
+    struct termios newattr;
     int ch;
     tcgetattr( STDIN_FILENO, &oldattr );
     newattr = oldattr;
@@ -11,6 +12,10 @@ int getch() {
     ch = getchar();
     tcsetattr( STDIN_FILENO, TCSANOW, &oldattr );
     return ch;
+}
+
+void restore_terminal_attrs() {
+    tcsetattr( STDIN_FILENO, TCSANOW, &oldattr );
 }
 
 void set_direction_from_input(enum direction *dir) {
