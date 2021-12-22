@@ -22,7 +22,7 @@ bin:
 	mkdir -p bin
 
 install: bin/snake
-	cp bin/snake /usr/local/bin/
+	cp bin/snake ~/.local/bin/
 
 clear:
 	rm -rf obj
